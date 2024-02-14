@@ -14,7 +14,7 @@ const WorkOrderSchema = new mongoose.Schema(
     pdcs: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "PDCSchema",
+        ref: "PDCModel",
       },
     ],
   },

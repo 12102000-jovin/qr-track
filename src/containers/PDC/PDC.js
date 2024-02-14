@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import moment from "moment-timezone";
 import ReactQRCode from "qrcode.react";
 import logo from "../../Images/FE-logo.png";
+import html2canvas from "html2canvas";
 
 import {
   Table,
@@ -28,7 +29,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 
 import PDCQRGenerator from "../../components/PDCQRGenerator/PDCQRGenerator";
 
-const WorkOrderDashboard = () => {
+const PDC = () => {
   const serverPortNumber = process.env.REACT_APP_SERVER_PORT;
   const applicationPortNumber = process.env.REACT_APP_APPLICATION_PORT;
 
@@ -44,12 +45,12 @@ const WorkOrderDashboard = () => {
 
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
-  const workOrderId = queryParams.get("id");
+  const workOrderId = queryParams.get("WorkOrderId");
 
   useEffect(() => {
     // Fetch options from database
     fetchPDCData();
-  }, []);
+  }, [PDCData]);
 
   const fetchPDCData = () => {
     axios
@@ -87,24 +88,48 @@ const WorkOrderDashboard = () => {
     setOpenModal(true);
   };
 
+  const handleDownload = (pdcID) => {
+    html2canvas(captureRef.current)
+      .then((canvas) => {
+        // Convert canvas to data URL
+        const imgData = canvas.toDataURL("image/png");
+
+        // Generate a unique filename
+        const fileName = `${pdcID}.png`;
+
+        // Create a download link with the specified filename
+        const a = document.createElement("a");
+        a.href = imgData;
+        a.download = fileName;
+        a.click();
+      })
+      .catch((error) => {
+        console.error("Error capturing image:", error);
+      });
+  };
+
+  const handleLinks = (link) => {
+    window.location.href = link;
+  };
+
   return (
     <div>
       <div className="flex justify-center bg-background border-none">
         <div className="w-3/4 p-6 shadow-lg bg-white rounded-md my-8">
-          <p className="text-3xl font-bold mb-5 mt-3">PDC List</p>
-          <div className="flex justify-center mb-5">
-            <div className="bg-black rounded-xl w-1/2 ">
-              <p className=" text-white font-semibold">
-                {" "}
-                Work Order ID: {workOrderId}
-              </p>
+          <p className="text-4xl text-signature font-black mb-5 mt-3">PDC</p>
+          <div className="p-5 m-1 bg-black rounded-md">
+            <div className="grid grid-cols-2 gap-x-4 text-white">
+              <div className="flex flex-col items-start ">
+                <p className="text-3xl font-bold mb-1 ">Work Order</p>
+                <p className="font-semibold">{workOrderId}</p>
+              </div>
             </div>
           </div>
 
           <div className="flex justify-center">
-            <TableContainer className="w-full m-1 border border-blue-400 rounded-md">
+            <TableContainer className="w-full m-1 border border-blue-600 rounded-md">
               <Table className="border-collapse w-full">
-                <TableHead className="bg-gradient-to-br from-signature to-teal-500 m-4">
+                <TableHead className="bg-signature m-4">
                   {/* <TableCell
                     align="center"
                     style={{
@@ -192,7 +217,7 @@ const WorkOrderDashboard = () => {
                           aria-label="links"
                           size="small"
                           style={{ color: "smokewhite" }}
-                          //   onClick={() => handleLinks(row.link)}
+                          onClick={() => handleLinks(row.link)}
                         >
                           <LaunchIcon fontSize="small" />
                         </IconButton>
@@ -210,7 +235,6 @@ const WorkOrderDashboard = () => {
                     outline: "none",
                   },
                 }}
-                className="bg-gradient-to-br from-signature to-teal-500 animate-shiny-pulse"
               >
                 <DialogContent>
                   <div ref={captureRef}>
@@ -243,7 +267,7 @@ const WorkOrderDashboard = () => {
                 <DialogActions>
                   <button
                     className="bg-signature hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded "
-                    // onClick={() => handleDownload(modalPdcID)}
+                    onClick={() => handleDownload(modalPdcID)}
                   >
                     Download
                   </button>
@@ -289,7 +313,7 @@ const WorkOrderDashboard = () => {
           },
         }}
       >
-        <DialogContent className="bg-gradient-to-br from-signature to-teal-500">
+        <DialogContent className="bg-blue-900">
           <PDCQRGenerator />
           <div className="flex justify-center">
             <button
@@ -305,4 +329,4 @@ const WorkOrderDashboard = () => {
   );
 };
 
-export default WorkOrderDashboard;
+export default PDC;

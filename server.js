@@ -47,4 +47,7 @@ app.use("/WorkOrder", workOrderRoute);
 const pdcRoute = require("./src/routes/PDCRoute");
 app.use("/PDC", pdcRoute);
 
+const subAssembly = require("./src/routes/SubAssemblyRoute");
+app.use("/SubAssembly", subAssembly);
+
 module.exports = app; // Export the app for testing purposes

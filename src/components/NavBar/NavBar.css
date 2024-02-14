@@ -19,7 +19,7 @@ nav li a {
 }
 
 nav li a:hover {
-  background: linear-gradient(to top left, #008080, #043f9d);
+  background: #043f9d;
   color: white;
 }
 
@@ -35,7 +35,7 @@ button {
 }
 
 button:hover {
-  background: linear-gradient(to top left, #008080, #043f9d);
+  background: #043f9d;
   color: white;
 }
 

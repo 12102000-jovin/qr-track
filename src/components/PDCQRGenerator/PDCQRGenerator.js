@@ -8,7 +8,7 @@ import JSZip from "jszip";
 import moment from "moment-timezone";
 import "moment/locale/en-au";
 
-const WorkOrderDashboard = () => {
+const PDCQRGenerator = () => {
   const [numQR, setNumQR] = useState(1);
   const [startNum, setStartNum] = useState(1);
 
@@ -41,20 +41,20 @@ const WorkOrderDashboard = () => {
 
   // Add a function to extract the work order ID
   const extractWorkOrderId = (link) => {
-    const regex = /id=(WO\d+)/;
+    const regex = /WorkOrderId=(WO\d+)/;
     const match = link.match(regex);
     return match ? match[1] : "Invalid Work Order ID";
   };
 
   const handleSubmit = async (e) => {
-    console.log(numQR);
-    console.log(startNum);
-    console.log(selectedValue);
+    // console.log(numQR);
+    // console.log(startNum);
+    // console.log(selectedValue);
 
     e.preventDefault();
 
     const links = Array.from({ length: numQR }, (_, index) => ({
-      link: `http://localhost:${applicationPortNumber}/WorkOrderDashboard?WorkOrderId=${selectedValue}&PDCId=PDC000${
+      link: `http://localhost:${applicationPortNumber}/PDCSectionDashboard?WorkOrderId=${selectedValue}&PDCId=PDC000${
         Number(startNum) + index
       }`,
 
@@ -142,7 +142,7 @@ const WorkOrderDashboard = () => {
     <div>
       <div className="flex justify-center border-none">
         <div className="w-96 p-6 text-white rounded-md ">
-          <p className="text-3xl text-center font-bold ">Add PDC</p>
+          <p className="text-4xl text-center font-black">Add PDC</p>
           {selectedValue && (
             <div className="flex justify-center">
               <p className="text-center text-l font-semibold mt-2 mb-5 bg-secondary w-full p-2 rounded-xl text-white ">
@@ -183,7 +183,7 @@ const WorkOrderDashboard = () => {
           </div>
           <div className="mt-3">
             <label
-              htmlFor="Work Order"
+              htmlFor="WorkOrder"
               className="block text-base mb-2 flex justify-start font-medium"
             >
               Work Order
@@ -273,4 +273,4 @@ const WorkOrderDashboard = () => {
   );
 };
 
-export default WorkOrderDashboard;
+export default PDCQRGenerator;

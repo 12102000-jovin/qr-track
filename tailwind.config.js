@@ -6,7 +6,7 @@ module.exports = {
       backgroundColor: {
         signature: "#043f9d",
         secondary: "#6c757d",
-        background: "#f3f3f4",
+        background: "#eef3f9",
       },
       colors: {
         signature: "#043f9d",

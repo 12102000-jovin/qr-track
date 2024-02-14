@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const WorkOrderModel = require("../models/WorkOrderModel");
-const PDCModel = require("../models/PDCModel");
+const { PDCModel } = require("../models/PDCModel");
 
 const applicationPortNumber = process.env.REACT_APP_APPLICATION_PORT;
 
@@ -16,7 +16,7 @@ router.post("/:WorkOrderId/generatePDC", async (req, res) => {
 
     // Ensure that the WorkOrder Exists
     const workOrder = await WorkOrderModel.findOne({
-      link: `http://localhost:${applicationPortNumber}/WorkOrderDashboard?id=${WorkOrderId}`,
+      link: `http://localhost:${applicationPortNumber}/PDC?WorkOrderId=${WorkOrderId}`,
     });
 
     if (!workOrder) {
@@ -52,7 +52,7 @@ router.get("/:WorkOrderId/getAllPDC", async (req, res) => {
   try {
     // Ensure that the WorkOrder Exists
     const workOrder = await WorkOrderModel.findOne({
-      link: `http://localhost:${applicationPortNumber}/WorkOrderDashboard?id=${WorkOrderId}`,
+      link: `http://localhost:${applicationPortNumber}/PDC?WorkOrderId=${WorkOrderId}`,
     });
 
     if (!workOrder) {
@@ -71,4 +71,13 @@ router.get("/:WorkOrderId/getAllPDC", async (req, res) => {
   }
 });
 
+// Get All PDC Method
+router.get("/getAllPDC", async (req, res) => {
+  try {
+    const PDCData = await PDCModel.find();
+    res.json(PDCData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 module.exports = router;

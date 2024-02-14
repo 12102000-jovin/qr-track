@@ -8,7 +8,7 @@ const SubAssemblySchema = new mongoose.Schema(
       unique: true,
     },
     generatedDate: {
-      // required: true,
+      required: true,
       type: String,
     },
   },

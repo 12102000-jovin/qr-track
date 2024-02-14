@@ -27,9 +27,7 @@ const QRCodeGenerator = ({
     const links = Array.from({ length: numQR }, (_, index) => ({
       link: `${host}${
         process.env.REACT_APP_APPLICATION_PORT
-      }/${entityNameNoSpace}Dashboard?id=${prefix}000${
-        Number(startNum) + index
-      }`,
+      }/PDC?WorkOrderId=${prefix}000${Number(startNum) + index}`,
       generatedDate: moment()
         .tz("Australia/Sydney")
         .format("YYYY-MM-DD HH:mm:ss"),
@@ -109,9 +107,9 @@ const QRCodeGenerator = ({
 
   return (
     <div>
-      <div className="flex justify-center  border-none">
+      <div className="flex justify-center border-none">
         <div className="w-96 p-5  text-white rounded-md ">
-          <p className="text-3xl text-center font-bold mb-10">
+          <p className="text-4xl text-center font-black mb-10">
             Add {entityName}
           </p>
           <div className="mt-10">
