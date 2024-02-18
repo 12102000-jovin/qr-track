@@ -6,6 +6,7 @@ import logo from "../../Images/FE-logo.png";
 import JSZip from "jszip";
 import moment from "moment-timezone";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 const SubAssemblyQRGenerator = () => {
   const [numQR, setNumQR] = useState(1);
@@ -16,18 +17,20 @@ const SubAssemblyQRGenerator = () => {
 
   const [options, setOption] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
-  const [workOrderId, setWorkOrderId] = useState("");
+  const [selectedWorkOrderId, setWorkOrderId] = useState("");
   const [PDCoption, setPDCOption] = useState([]);
-  const [PDCId, setPDCId] = useState("");
+  const [selectedPDCId, setPDCId] = useState("");
 
   const [qrCode, setQRCodes] = useState([]);
   const [imageData, setImageData] = useState([]);
 
   const [qrGenerated, setQRGenerated] = useState(false);
 
-  const [section, setSection] = useState("upstair");
+  const [selectedSection, setSection] = useState("");
 
   const [subAssemblyData, setsubAssemblyData] = useState(null);
+
+  const { workOrderId, pdcId, section } = useParams();
 
   useEffect(() => {
     // Fetch options from database
@@ -36,10 +39,26 @@ const SubAssemblyQRGenerator = () => {
     fetchPDCData();
   }, [subAssemblyData]);
 
+  useEffect(() => {
+    // Set initial value of selectedValue to workOrderId
+    if (workOrderId) {
+      setWorkOrderId(workOrderId);
+    }
+
+    // Set initial value of selectedValue to pdcId
+    if (pdcId) {
+      setPDCId(pdcId);
+    }
+
+    if (section) {
+      setSelectedValue(section);
+    }
+  }, [workOrderId, pdcId, section]);
+
   const fetchSubAssemblyData = () => {
     axios
       .get(
-        `http://localhost:${process.env.REACT_APP_SERVER_PORT}/SubAssembly/${section}/WO0001/PDC0002/getSubAssembly`
+        `http://localhost:${process.env.REACT_APP_SERVER_PORT}/SubAssembly/${selectedSection}/WO0001/PDC0002/getSubAssembly`
       )
       .then((response) => {
         setsubAssemblyData(response.data.upstairsPDC);
@@ -73,14 +92,14 @@ const SubAssemblyQRGenerator = () => {
 
   // Add a function to extract the work order ID
   const extractWorkOrderId = (link) => {
-    const regex = /WorkOrderId=(WO\d+)/;
+    const regex = /(WO\d+)/;
     const match = link.match(regex);
     return match ? match[1] : "Invalid Work Order ID";
   };
 
   // Add a function to extract the PDC Id
   const extractPDCId = (link) => {
-    const regex = /PDCId=(PDC\d+)/;
+    const regex = /(PDC\d+)/;
     const match = link.match(regex);
     return match ? match[1] : "Invalid PDC ID";
   };
@@ -90,12 +109,13 @@ const SubAssemblyQRGenerator = () => {
     // console.log(startNum);
     // console.log(selectedValue);
     // console.log(workOrderId);
-    // console.log(PDCId);
+    // console.log(pdcId);
+    // console.log(section);
 
     e.preventDefault();
 
     const links = Array.from({ length: numQR }, (_, index) => ({
-      link: `http://localhost:${applicationPortNumber}/${section}/${workOrderId}/${PDCId}/SUB000${
+      link: `http://localhost:${applicationPortNumber}/${selectedSection}/${selectedWorkOrderId}/${selectedPDCId}/SUB000${
         Number(startNum) + index
       }`,
       generatedDate: moment()
@@ -105,7 +125,7 @@ const SubAssemblyQRGenerator = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:${serverPortNumber}/SubAssembly/${section}/${workOrderId}/${PDCId}/generateSubAssembly`,
+        `http://localhost:${serverPortNumber}/SubAssembly/${selectedSection}/${selectedWorkOrderId}/${selectedPDCId}/generateSubAssembly`,
         links // Send the array of links
       );
 
@@ -191,7 +211,7 @@ const SubAssemblyQRGenerator = () => {
           <div className="mt-3">
             <label
               htmlFor="numQR"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Number of QR
             </label>
@@ -206,7 +226,7 @@ const SubAssemblyQRGenerator = () => {
           <div className="mt-3">
             <label
               htmlFor="startSubAssemblyNum"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Starting Sub-Assembly Number
             </label>
@@ -221,7 +241,7 @@ const SubAssemblyQRGenerator = () => {
           <div className="mt-3">
             <label
               htmlFor="Section"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Section
             </label>
@@ -230,6 +250,7 @@ const SubAssemblyQRGenerator = () => {
               value={selectedValue}
               onChange={(e) => setSelectedValue(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300 sm:text-sm text-black"
+              disabled
             >
               <option>Select Section ...</option>
               <option>Upstairs</option>
@@ -239,15 +260,16 @@ const SubAssemblyQRGenerator = () => {
           <div className="mt-3">
             <label
               htmlFor="WorkOrderId"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Work Order
             </label>
             <select
               id="workOrderDropdown"
-              value={workOrderId}
+              value={selectedWorkOrderId}
               onChange={(e) => setWorkOrderId(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300 sm:text-sm text-black"
+              disabled
             >
               <option value="">Select Work Order</option>
               {options.map((option) => (
@@ -258,24 +280,25 @@ const SubAssemblyQRGenerator = () => {
             </select>
           </div>
 
-          {workOrderId && (
+          {selectedWorkOrderId && (
             <div className="mt-3">
               <label
                 htmlFor="PDCId"
-                className="block text-base mb-2 flex justify-start font-medium flex items-center"
+                className="block text-base mb-2 flex justify-start font-bold flex items-center"
               >
                 PDC
                 <span className="ml-1"> </span>
-                <span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
-                  {workOrderId}
+                <span class="bg-white text-black text-xs font-black px-2.5 py-0.5 rounded-full">
+                  {selectedWorkOrderId}
                 </span>
               </label>
 
               <select
                 id="PDCDropdown"
-                value={PDCId}
+                value={selectedPDCId}
                 onChange={(e) => setPDCId(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300 sm:text-sm text-black"
+                className="mt-1 block w-full border border-black-300 rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300 sm:text-sm text-black"
+                disabled
               >
                 <option value="">Select PDC</option>
                 {PDCoption.map((PDCoption) => (

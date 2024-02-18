@@ -4,7 +4,6 @@ const router = express.Router();
 
 const WorkOrderModel = require("../models/WorkOrderModel");
 
-// Post Method
 router.post("/generateWorkOrder", async (req, res) => {
   // Check if req.body is defined and has the 'links' property
   if (!req.body || !req.body.links) {
@@ -18,15 +17,29 @@ router.post("/generateWorkOrder", async (req, res) => {
     return res.status(400).json("'links' property must be an array.");
   }
 
-  const links = req.body.links.map((link) => ({
+  const linksToInsert = req.body.links.map((link) => ({
     link: link.link,
     generatedDate: new Date(),
   }));
 
   try {
-    const workOrdersToSave = await WorkOrderModel.insertMany(links);
+    // Check for duplicate links before inserting
+    const existingLinks = await WorkOrderModel.find({
+      link: { $in: linksToInsert.map((link) => link.link) },
+    });
+
+    if (existingLinks.length > 0) {
+      // Handle duplicate error
+      return res
+        .status(400)
+        .json("Duplicate Work Order Found. Please generate other Work Order.");
+    }
+
+    // No duplicates found, proceed to insert
+    const workOrdersToSave = await WorkOrderModel.insertMany(linksToInsert);
     res.status(200).json(workOrdersToSave);
   } catch (err) {
+    // Handle other errors
     res.status(400).json("Error:", err.message);
   }
 });

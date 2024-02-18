@@ -19,15 +19,16 @@ const QRCodeGenerator = ({
   const [qrCode, setQRCodes] = useState([]);
   const [imageData, setImageData] = useState([]);
   const [qrGenerated, setQRGenerated] = useState(false);
+  const [duplicateError, setDuplicateError] = useState(null);
   const host = "http://localhost:";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const links = Array.from({ length: numQR }, (_, index) => ({
-      link: `${host}${
-        process.env.REACT_APP_APPLICATION_PORT
-      }/PDC?WorkOrderId=${prefix}000${Number(startNum) + index}`,
+      link: `${host}${process.env.REACT_APP_APPLICATION_PORT}/PDC/${prefix}000${
+        Number(startNum) + index
+      }`,
       generatedDate: moment()
         .tz("Australia/Sydney")
         .format("YYYY-MM-DD HH:mm:ss"),
@@ -47,8 +48,12 @@ const QRCodeGenerator = ({
       });
 
       setQRGenerated(true);
+      setDuplicateError(null); // Reset error state on successful generation
     } catch (error) {
       console.error(`Error saving QR codes for ${entityName}:`, error);
+      setDuplicateError(
+        error.response ? error.response.data : "An error occurred."
+      );
     }
   };
 
@@ -112,10 +117,15 @@ const QRCodeGenerator = ({
           <p className="text-4xl text-center font-black mb-10">
             Add {entityName}
           </p>
+          {duplicateError && (
+            <p className="bg-red-100 text-center text-red-800 text-sm font-semibold me-2 px-4 py-1 rounded dark:bg-red-900 dark:text-red-300">
+              {duplicateError}
+            </p>
+          )}
           <div className="mt-10">
             <label
               htmlFor="numQR"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Number of QR
             </label>
@@ -131,7 +141,7 @@ const QRCodeGenerator = ({
           <div className="mt-3">
             <label
               htmlFor="startEntityNum"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Starting {entityName} Number
             </label>

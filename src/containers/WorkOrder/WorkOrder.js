@@ -44,7 +44,7 @@ const WorkOrder = () => {
 
   useEffect(() => {
     fetchWorkOrderData();
-  }, [data]);
+  }, [searchQuery]);
 
   const fetchWorkOrderData = () => {
     axios
@@ -67,7 +67,7 @@ const WorkOrder = () => {
   };
 
   const extractIdFromLink = (link) => {
-    const match = link.match(/WorkOrderId=WO(\d+)/);
+    const match = link.match(/WO(\d+)/);
     return match ? `WO${match[1]}` : null;
   };
 
@@ -98,6 +98,7 @@ const WorkOrder = () => {
 
   const handleAddWorkOrderCloseModal = () => {
     setOpenWorkOrderModal(false);
+    fetchWorkOrderData();
   };
 
   const handleSearchChange = (e) => {
@@ -129,47 +130,57 @@ const WorkOrder = () => {
           <p className="text-4xl text-signature font-black mb-5 mt-3">
             Work Order
           </p>
-          <form className="p-1">
-            <label
-              htmlFor="default-search"
-              className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-            >
-              Search
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                  aria-hidden="true"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
+          <div className="flex">
+            <form className="p-1 flex-grow">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                    aria-hidden="true"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="search"
+                  id="default-search"
+                  className="block p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-1/3"
+                  placeholder="Search Work Order"
+                  required
+                  onChange={handleSearchChange}
+                  value={searchQuery}
+                />
               </div>
-              <input
-                type="search"
-                id="default-search"
-                className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Search Work Order"
-                required
-                onChange={handleSearchChange}
-                value={searchQuery}
-              />
-            </div>
-          </form>
-          <hr class="h-px m-1 my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+            </form>
+            <form class="max-w-sm mx-auto">
+              <select
+                id="countries"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="10" selected>
+                  {" "}
+                  10
+                </option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+              </select>
+            </form>
+          </div>
+          <hr className="h-px m-1 my-2 bg-gray-200 border-0 dark:bg-gray-700" />
           <div className="flex justify-center">
             <TableContainer className="w-full m-1 border border-blue-600 rounded-md">
               <Table className="border-collapse w-full">
-                <TableHead className="bg-signature m-4 ">
-                  {/* <TableCell
+                <TableBody>
+                  <TableRow className="bg-signature m-4">
+                    {/* <TableCell
                     align="center"
                     style={{
                       width: "40%",
@@ -180,45 +191,46 @@ const WorkOrder = () => {
                   >
                     Link
                   </TableCell> */}
-                  <TableCell
-                    align="center"
-                    style={{
-                      width: "20%",
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: "1.10rem",
-                    }}
-                  >
-                    Work Order ID
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    style={{
-                      width: "20%",
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: "1.10rem",
-                    }}
-                  >
-                    Generated Date
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    style={{
-                      width: "20%",
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: "1.10rem",
-                    }}
-                  >
-                    Action
-                  </TableCell>
-                </TableHead>
+                    <TableCell
+                      align="center"
+                      style={{
+                        width: "20%",
+                        color: "white",
+                        fontWeight: "bold",
+                        fontSize: "1.10rem",
+                      }}
+                    >
+                      Work Order ID
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{
+                        width: "20%",
+                        color: "white",
+                        fontWeight: "bold",
+                        fontSize: "1.10rem",
+                      }}
+                    >
+                      Generated Date
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      style={{
+                        width: "20%",
+                        color: "white",
+                        fontWeight: "bold",
+                        fontSize: "1.10rem",
+                      }}
+                    >
+                      Action
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
                 <TableBody>
                   {searchResults.map((row) => (
                     <TableRow
                       key={row._id}
-                      className="border-blue-400 border-1"
+                      className="border-blue-400 border-1 hover:bg-gray-100"
                     >
                       {/* <TableCell align="center">{row.link}</TableCell> */}
                       <TableCell align="center">

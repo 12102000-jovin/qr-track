@@ -21,7 +21,6 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { Rowing } from "@mui/icons-material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -87,8 +86,12 @@ const SubAssembly = () => {
         <div className="flex justify-center bg-background border-none">
           <div className="w-3/4 p-6 shadow-lg bg-white rounded-md my-8">
             <div className="flex justify-center">
-              <p className="text-4xl text-signature font-black mb-5 mt-3">
-                {section} Section
+              <p className="text-4xl text-signature font-black mb-5 mt-3 flex items-center">
+                {" "}
+                Sub-Assembly{" "}
+                <span className="p-2 ml-3 bg-red-600 text-xl text-white rounded-full">
+                  {section}
+                </span>
               </p>
             </div>
             <div className="p-5 m-1 bg-black rounded-md">
@@ -152,7 +155,7 @@ const SubAssembly = () => {
                   <TableBody>
                     {data &&
                       data.map((row) => (
-                        <TableRow key={row.id}>
+                        <TableRow key={row.id} className="hover:bg-gray-100">
                           <TableCell align="center">
                             {" "}
                             {extractSubAssemblyId(row.link)}

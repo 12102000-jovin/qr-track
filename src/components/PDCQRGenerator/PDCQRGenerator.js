@@ -7,6 +7,7 @@ import logo from "../../Images/FE-logo.png";
 import JSZip from "jszip";
 import moment from "moment-timezone";
 import "moment/locale/en-au";
+import { useParams } from "react-router-dom";
 
 const PDCQRGenerator = () => {
   const [numQR, setNumQR] = useState(1);
@@ -23,10 +24,19 @@ const PDCQRGenerator = () => {
 
   const [qrGenerated, setQRGenerated] = useState(false);
 
+  const { workOrderId } = useParams();
+
   useEffect(() => {
     // Fetch options from database
     fetchWorkOrderData();
   }, []);
+
+  useEffect(() => {
+    // Set initial value of selectedValue to current workOrderId
+    if (workOrderId) {
+      setSelectedValue(workOrderId);
+    }
+  }, [workOrderId]);
 
   const fetchWorkOrderData = () => {
     axios
@@ -41,7 +51,7 @@ const PDCQRGenerator = () => {
 
   // Add a function to extract the work order ID
   const extractWorkOrderId = (link) => {
-    const regex = /WorkOrderId=(WO\d+)/;
+    const regex = /(WO\d+)/;
     const match = link.match(regex);
     return match ? match[1] : "Invalid Work Order ID";
   };
@@ -54,7 +64,7 @@ const PDCQRGenerator = () => {
     e.preventDefault();
 
     const links = Array.from({ length: numQR }, (_, index) => ({
-      link: `http://localhost:${applicationPortNumber}/PDCSectionDashboard?WorkOrderId=${selectedValue}&PDCId=PDC000${
+      link: `http://localhost:${applicationPortNumber}/PDCSectionDashboard/${selectedValue}/PDC000${
         Number(startNum) + index
       }`,
 
@@ -154,7 +164,7 @@ const PDCQRGenerator = () => {
           <div className="mt-3">
             <label
               htmlFor="numQR"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Number of QR
             </label>
@@ -169,7 +179,7 @@ const PDCQRGenerator = () => {
           <div className="mt-3">
             <label
               htmlFor="startEntityNum"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Starting PDC Number
             </label>
@@ -184,7 +194,7 @@ const PDCQRGenerator = () => {
           <div className="mt-3">
             <label
               htmlFor="WorkOrder"
-              className="block text-base mb-2 flex justify-start font-medium"
+              className="block text-base mb-2 flex justify-start font-bold"
             >
               Work Order
             </label>
@@ -193,6 +203,7 @@ const PDCQRGenerator = () => {
               value={selectedValue}
               onChange={(e) => setSelectedValue(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300 sm:text-sm text-black"
+              disabled
             >
               <option value="">Select Work Order ...</option>
               {options.map((option) => (

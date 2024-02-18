@@ -3,7 +3,7 @@ import axios from "axios";
 import "moment/locale/en-au";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import moment from "moment-timezone";
 import ReactQRCode from "qrcode.react";
 import logo from "../../Images/FE-logo.png";
@@ -43,9 +43,7 @@ const PDC = () => {
   const [openAddPDCModal, setOpenPDCModal] = useState(false);
   const [modalPdcID, setModalPdcID] = useState(null);
 
-  const { search } = useLocation();
-  const queryParams = new URLSearchParams(search);
-  const workOrderId = queryParams.get("WorkOrderId");
+  const { workOrderId } = useParams();
 
   useEffect(() => {
     // Fetch options from database
@@ -65,7 +63,7 @@ const PDC = () => {
 
   // Add a function to extract the work order ID
   const extractPDCId = (link) => {
-    const regex = /PDCId=(PDC\d+)/;
+    const regex = /(PDC\d+)/;
     const match = link.match(regex);
     return match ? match[1] : "Invalid PDC ID";
   };
@@ -177,7 +175,7 @@ const PDC = () => {
                 </TableHead>
                 <TableBody>
                   {PDCData.map((row) => (
-                    <TableRow key={row.id}>
+                    <TableRow key={row.id} className="hover:bg-gray-100">
                       {/* <TableCell align="center">{row.link}</TableCell> */}
                       <TableCell align="center">
                         {row.link && extractPDCId(row.link)}

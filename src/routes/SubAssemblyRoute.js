@@ -13,7 +13,7 @@ router.post(
       const links = req.body;
 
       const workOrder = await WorkOrderModel.findOne({
-        link: `http://localhost:${applicationPortNumber}/PDC?WorkOrderId=${WorkOrderId}`,
+        link: `http://localhost:${applicationPortNumber}/PDC/${WorkOrderId}`,
       }).populate("pdcs");
 
       if (!workOrder) {
@@ -24,7 +24,7 @@ router.post(
         const { link, generatedDate } = linkObj; // Include the generatedDate
 
         const pdcWithReference = workOrder.pdcs.find((pdc) => {
-          if (pdc.link && pdc.link.includes(`PDCId=${PDCId}`)) {
+          if (pdc.link && pdc.link.includes(`/${PDCId}`)) {
             return true;
           }
           return false;
@@ -62,7 +62,7 @@ router.get("/Upstairs/:WorkOrderId/:PDCId/getSubAssembly", async (req, res) => {
     // console.log(PDCId);
     // Ensure that the WorkOrder exists and populate the pdcs array with the PDC documents
     const workOrder = await WorkOrderModel.findOne({
-      link: `http://localhost:${applicationPortNumber}/PDC?WorkOrderId=${WorkOrderId}`,
+      link: `http://localhost:${applicationPortNumber}/PDC/${WorkOrderId}`,
     }).populate("pdcs");
 
     if (!workOrder) {
@@ -76,7 +76,7 @@ router.get("/Upstairs/:WorkOrderId/:PDCId/getSubAssembly", async (req, res) => {
       // Ensure that pdc.link is defined before using the includes method
       if (pdc.link) {
         // console.log("PDC link:", pdc.link);
-        return pdc.link.includes(`PDCId=${PDCId}`);
+        return pdc.link.includes(`/${PDCId}`);
       }
       return false;
     });

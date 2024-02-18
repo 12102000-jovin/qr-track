@@ -16,7 +16,7 @@ router.post("/:WorkOrderId/generatePDC", async (req, res) => {
 
     // Ensure that the WorkOrder Exists
     const workOrder = await WorkOrderModel.findOne({
-      link: `http://localhost:${applicationPortNumber}/PDC?WorkOrderId=${WorkOrderId}`,
+      link: `http://localhost:${applicationPortNumber}/PDC/${WorkOrderId}`,
     });
 
     if (!workOrder) {
@@ -52,7 +52,7 @@ router.get("/:WorkOrderId/getAllPDC", async (req, res) => {
   try {
     // Ensure that the WorkOrder Exists
     const workOrder = await WorkOrderModel.findOne({
-      link: `http://localhost:${applicationPortNumber}/PDC?WorkOrderId=${WorkOrderId}`,
+      link: `http://localhost:${applicationPortNumber}/PDC/${WorkOrderId}`,
     });
 
     if (!workOrder) {
