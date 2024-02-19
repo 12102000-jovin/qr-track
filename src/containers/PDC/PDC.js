@@ -61,13 +61,6 @@ const PDC = () => {
       });
   };
 
-  // Add a function to extract the work order ID
-  const extractPDCId = (link) => {
-    const regex = /(PDC\d+)/;
-    const match = link.match(regex);
-    return match ? match[1] : "Invalid PDC ID";
-  };
-
   const handleAddPDCModal = () => {
     setOpenPDCModal(true);
   };
@@ -82,12 +75,17 @@ const PDC = () => {
 
   const showQRCodes = (data, row) => {
     setQrCodeData(data.link);
-    setModalPdcID(extractPDCId(data.link));
+    setModalPdcID(data.pdcId);
     setOpenModal(true);
   };
 
   const handleDownload = (pdcID) => {
-    html2canvas(captureRef.current)
+    const captureOptions = {
+      width: 512,
+      height: 565,
+    };
+
+    html2canvas(captureRef.current, captureOptions)
       .then((canvas) => {
         // Convert canvas to data URL
         const imgData = canvas.toDataURL("image/png");
@@ -128,17 +126,6 @@ const PDC = () => {
             <TableContainer className="w-full m-1 border border-blue-600 rounded-md">
               <Table className="border-collapse w-full">
                 <TableHead className="bg-signature m-4">
-                  {/* <TableCell
-                    align="center"
-                    style={{
-                      width: "40%",
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: "1.10rem",
-                    }}
-                  >
-                    Link
-                  </TableCell> */}
                   <TableCell
                     align="center"
                     style={{
@@ -177,9 +164,7 @@ const PDC = () => {
                   {PDCData.map((row) => (
                     <TableRow key={row.id} className="hover:bg-gray-100">
                       {/* <TableCell align="center">{row.link}</TableCell> */}
-                      <TableCell align="center">
-                        {row.link && extractPDCId(row.link)}
-                      </TableCell>
+                      <TableCell align="center">{row.pdcId}</TableCell>
                       <TableCell align="center">
                         {" "}
                         {moment(row.generatedDate)
@@ -257,7 +242,7 @@ const PDC = () => {
                         marginTop: "5px",
                       }}
                     >
-                      PDC ID: {qrCodeData && extractPDCId(qrCodeData)}
+                      PDC ID: {modalPdcID}
                     </p>
                   </div>
                 </DialogContent>

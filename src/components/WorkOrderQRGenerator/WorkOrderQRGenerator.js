@@ -25,13 +25,32 @@ const QRCodeGenerator = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const currentYear = moment().tz("Australia/Sydney").format("YY");
+
+    const formatWorkOrderId = (number) => {
+      if (number < 10) {
+        return `000${number}`;
+      } else if (number < 100) {
+        return `00${number}`;
+      } else if (number < 1000) {
+        return `0${number}`;
+      } else {
+        return `${number}`;
+      }
+    };
+
     const links = Array.from({ length: numQR }, (_, index) => ({
-      link: `${host}${process.env.REACT_APP_APPLICATION_PORT}/PDC/${prefix}000${
+      link: `${host}${
+        process.env.REACT_APP_APPLICATION_PORT
+      }/PDC/${prefix}2${currentYear}${formatWorkOrderId(
         Number(startNum) + index
-      }`,
+      )}`,
       generatedDate: moment()
         .tz("Australia/Sydney")
         .format("YYYY-MM-DD HH:mm:ss"),
+      workOrderId: `${prefix}2${currentYear}${formatWorkOrderId(
+        Number(startNum) + index
+      )}`,
     }));
 
     try {
@@ -41,7 +60,9 @@ const QRCodeGenerator = ({
       setQRCodes(() => {
         const newQRCodes = data.map((qrcode, index) => ({
           ...qrcode,
-          entityId: `${prefix}000${Number(startNum) + index}`,
+          entityId: `${prefix}2${currentYear}${formatWorkOrderId(
+            Number(startNum) + index
+          )}`,
         }));
 
         return newQRCodes;
@@ -58,7 +79,6 @@ const QRCodeGenerator = ({
   };
 
   const handleDownload = async (entityId) => {
-    const qrCodeData = qrCode.find((code) => code.entityId === entityId);
     const qrCodeElement = document.getElementById(`qrcode-${entityId}`);
 
     const qrCodeCanvas = await html2canvas(qrCodeElement, {
@@ -68,7 +88,7 @@ const QRCodeGenerator = ({
 
     const a = document.createElement("a");
     a.href = qrCodeCanvas.toDataURL("image/png");
-    a.download = `${entityName}_${entityId}.png`;
+    a.download = `${entityId}.png`;
     a.click();
   };
 

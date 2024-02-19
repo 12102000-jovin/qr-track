@@ -30,15 +30,15 @@ const PDCSectionDashboard = () => {
             style={{ backgroundColor: "#043f9d" }}
           >
             <CableIcon style={{ fontSize: "6rem" }} />
-            <p>Upstairs</p>
+            <p>Panel</p>
           </div>
           <div className={cardStyle} style={{ backgroundColor: "#043f9d" }}>
             <SettingsInputComponentIcon style={{ fontSize: "6rem" }} />
-            <p>Downstairs</p>
+            <p>More... </p>
           </div>
           <div className={cardStyle} style={{ backgroundColor: "#043f9d" }}>
             <ElectricalServicesIcon style={{ fontSize: "6rem" }} />
-            <p>Wiring</p>
+            <p>More...</p>
           </div>
           <div className={cardStyle} style={{ backgroundColor: "#043f9d" }}>
             <CableIcon style={{ fontSize: "6rem" }} />

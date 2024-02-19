@@ -11,6 +11,11 @@ const WorkOrderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    workOrderId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     pdcs: [
       {
         type: mongoose.Schema.Types.ObjectId,

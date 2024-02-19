@@ -256,7 +256,7 @@ const NavBar = () => {
       >
         <div className="flex justify-center items-center flex-col">
           <h1
-            className=" text-white text-center font-black text-6xl mb-5"
+            className="text-white text-center font-black text-6xl mb-5"
             style={{ textShadow: "4px 4px #043f9d" }}
           >
             Scan QR Code{" "}

@@ -23,10 +23,23 @@ router.post("/:WorkOrderId/generatePDC", async (req, res) => {
       return res.status(404).json({ message: "WorkOrder not found" });
     }
 
+    // Check for existing PDC IDs
+    const existingPDCs = await PDCModel.find({
+      pdcId: { $in: pdcs.map((pdc) => pdc.pdcId) },
+    });
+
+    if (existingPDCs.length > 0) {
+      // Some PDC IDs already exist
+      return res
+        .status(400)
+        .json("Duplicate PDC Found. Please generate other PDC.");
+    }
+
     // Create an array of PDC documents
     const pdcDocuments = pdcs.map((pdc) => ({
       ...pdc,
       workOrder: WorkOrderId,
+      pdcId: pdc.pdcId,
     }));
 
     // Insert the PDC documents
@@ -78,6 +91,23 @@ router.get("/getAllPDC", async (req, res) => {
     res.json(PDCData);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Get latest pdc id
+router.get("/getLatestPDC", async (req, res) => {
+  try {
+    // Find the document with the highest PDC ID
+    const latestPDC = await PDCModel.findOne().sort({ pdcId: -1 }).limit(1);
+
+    if (latestPDC) {
+      res.json(latestPDC.pdcId);
+    } else {
+      res.json(null); // No PDC found
+    }
+  } catch (error) {
+    console.error("Error fetching latest PDC ID:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 module.exports = router;

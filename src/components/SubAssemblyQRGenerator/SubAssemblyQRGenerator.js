@@ -105,17 +105,17 @@ const SubAssemblyQRGenerator = () => {
   };
 
   const handleSubmit = async (e) => {
-    // console.log(numQR);
-    // console.log(startNum);
-    // console.log(selectedValue);
-    // console.log(workOrderId);
-    // console.log(pdcId);
-    // console.log(section);
+    console.log(numQR);
+    console.log(startNum);
+    console.log(selectedValue);
+    console.log(workOrderId);
+    console.log(pdcId);
+    console.log(section);
 
     e.preventDefault();
 
     const links = Array.from({ length: numQR }, (_, index) => ({
-      link: `http://localhost:${applicationPortNumber}/${selectedSection}/${selectedWorkOrderId}/${selectedPDCId}/SUB000${
+      link: `http://localhost:${applicationPortNumber}/${section}/${selectedWorkOrderId}/${selectedPDCId}/SUB000${
         Number(startNum) + index
       }`,
       generatedDate: moment()
@@ -125,7 +125,7 @@ const SubAssemblyQRGenerator = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:${serverPortNumber}/SubAssembly/${selectedSection}/${selectedWorkOrderId}/${selectedPDCId}/generateSubAssembly`,
+        `http://localhost:${serverPortNumber}/SubAssembly/${section}/${selectedWorkOrderId}/${selectedPDCId}/generateSubAssembly`,
         links // Send the array of links
       );
 
@@ -250,7 +250,6 @@ const SubAssemblyQRGenerator = () => {
               value={selectedValue}
               onChange={(e) => setSelectedValue(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring focus:border-blue-300 sm:text-sm text-black"
-              disabled
             >
               <option>Select Section ...</option>
               <option>Upstairs</option>

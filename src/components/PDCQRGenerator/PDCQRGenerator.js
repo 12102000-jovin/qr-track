@@ -24,11 +24,16 @@ const PDCQRGenerator = () => {
 
   const [qrGenerated, setQRGenerated] = useState(false);
 
+  const [latestPDCId, setLatestPDCId] = useState("");
+
   const { workOrderId } = useParams();
+
+  const [duplicateError, setDuplicateError] = useState("");
 
   useEffect(() => {
     // Fetch options from database
     fetchWorkOrderData();
+    fetchLatestPDC();
   }, []);
 
   useEffect(() => {
@@ -49,28 +54,47 @@ const PDCQRGenerator = () => {
       });
   };
 
-  // Add a function to extract the work order ID
-  const extractWorkOrderId = (link) => {
-    const regex = /(WO\d+)/;
-    const match = link.match(regex);
-    return match ? match[1] : "Invalid Work Order ID";
+  const fetchLatestPDC = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:${serverPortNumber}/PDC/getLatestPDC`
+      );
+      const latestPDC = response.data;
+      const latestPDCid = latestPDC.replace("PDC", "");
+      setLatestPDCId(Number(latestPDCid));
+    } catch (error) {
+      console.error("Error fetching latest PDC:", error);
+    }
   };
 
   const handleSubmit = async (e) => {
-    // console.log(numQR);
-    // console.log(startNum);
-    // console.log(selectedValue);
-
     e.preventDefault();
 
-    const links = Array.from({ length: numQR }, (_, index) => ({
-      link: `http://localhost:${applicationPortNumber}/PDCSectionDashboard/${selectedValue}/PDC000${
-        Number(startNum) + index
-      }`,
+    const formatPDCId = (number) => {
+      if (number < 10) {
+        return `00000${number}`;
+      } else if (number < 100) {
+        return `0000${number}`;
+      } else if (number < 1000) {
+        return `000${number}`;
+      } else if (number < 10000) {
+        return `00${number}`;
+      } else if (number < 100000) {
+        return `0${number}`;
+      } else {
+        return `${number}`;
+      }
+    };
 
+    const links = Array.from({ length: numQR }, (_, index) => ({
+      link: `http://localhost:${applicationPortNumber}/PDCSectionDashboard/${selectedValue}/PDC${formatPDCId(
+        Number(startNum) + index
+      )}
+      `,
       generatedDate: moment()
         .tz("Australia/Sydney")
         .format("YYYY-MM-DD HH:mm:ss"),
+      pdcId: `PDC${formatPDCId(Number(startNum) + index)}`,
     }));
 
     try {
@@ -84,24 +108,27 @@ const PDCQRGenerator = () => {
       setQRCodes(() => {
         const newQRCodes = response.data.map((qrcode, index) => ({
           ...qrcode,
-          PDCId: `PDC000${Number(startNum) + index}`,
+          pdcId: `PDC${formatPDCId(Number(startNum) + index)}`,
         }));
 
         return newQRCodes;
       });
       setQRGenerated(true);
+      setDuplicateError(null);
     } catch (error) {
       console.error("Error saving QR codes:", error);
+      setDuplicateError(
+        error.response ? error.response.data : "An error occurred."
+      );
     }
   };
 
   const handleDownload = async (PDCId) => {
-    const qrCodeData = qrCode.find((code) => code.PDCId === PDCId);
     const qrCodeElement = document.getElementById(`qrcode-${PDCId}`);
 
     const qrCodeCanvas = await html2canvas(qrCodeElement, {
-      width: 512, // Specify your desired width
-      height: 565, // Specify your desired height
+      width: 512,
+      height: 565,
     });
 
     const a = document.createElement("a");
@@ -155,11 +182,18 @@ const PDCQRGenerator = () => {
           <p className="text-4xl text-center font-black">Add PDC</p>
           {selectedValue && (
             <div className="flex justify-center">
-              <p className="text-center text-l font-semibold mt-2 mb-5 bg-secondary w-full p-2 rounded-xl text-white ">
+              <p className="text-center text-l font-semibold mt-2 mb-5 bg-black w-full p-2 rounded-xl text-white ">
                 Generate PDC for {selectedValue}
               </p>
             </div>
           )}
+          <div className="text-center">
+            {duplicateError && (
+              <p className="bg-red-100 text-center text-red-800 text-sm font-semibold mx-auto px-4 py-1 rounded dark:bg-red-900 dark:text-red-300">
+                {duplicateError}
+              </p>
+            )}
+          </div>
 
           <div className="mt-3">
             <label
@@ -182,6 +216,10 @@ const PDCQRGenerator = () => {
               className="block text-base mb-2 flex justify-start font-bold"
             >
               Starting PDC Number
+              <p className="p-1 pl-2 pr-2 bg-red-700 rounded-full text-xs ml-2">
+                {" "}
+                Latest PDC Id: {latestPDCId}
+              </p>
             </label>
             <input
               type="number"
@@ -189,6 +227,7 @@ const PDCQRGenerator = () => {
               className="border w-full px-2 py-1 rounded-md focus:outline-none focus:ring-3 focus:border-gray-600 text-black"
               min="1"
               onChange={(e) => setStartNum(e.target.value)}
+              placeholder={`Next PDC Id: ${latestPDCId + 1}`}
             />
           </div>
           <div className="mt-3">
@@ -208,7 +247,7 @@ const PDCQRGenerator = () => {
               <option value="">Select Work Order ...</option>
               {options.map((option) => (
                 <option key={option._id} value={option.value}>
-                  {extractWorkOrderId(option.link)}
+                  {option.workOrderId}
                 </option>
               ))}
             </select>

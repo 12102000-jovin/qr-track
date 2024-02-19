@@ -36,7 +36,7 @@ const WorkOrder = () => {
   const [openModal, setOpenModal] = useState(false);
 
   const captureRef = useRef(null);
-  const [modalPdcID, setModalPdcID] = useState(null);
+  const [modalWorkOrderId, setModalWorkOrderId] = useState(null);
 
   const [openWorkOrderModal, setOpenWorkOrderModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,19 +66,19 @@ const WorkOrder = () => {
     window.location.href = link;
   };
 
-  const extractIdFromLink = (link) => {
-    const match = link.match(/WO(\d+)/);
-    return match ? `WO${match[1]}` : null;
-  };
-
   const showQRCodes = (data, row) => {
     setQrCodeData(data.link);
-    setModalPdcID(extractIdFromLink(data.link));
+    setModalWorkOrderId(data.workOrderId);
     setOpenModal(true);
   };
 
   const handleDownload = (workOrderID) => {
-    html2canvas(captureRef.current)
+    const captureOptions = {
+      width: 512,
+      height: 565,
+    };
+
+    html2canvas(captureRef.current, captureOptions)
       .then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
         const fileName = `${workOrderID}.png`;
@@ -109,10 +109,14 @@ const WorkOrder = () => {
 
   const applySearchFilter = (data) => {
     const filteredResults = data.filter((item) => {
-      const workOrderId = extractIdFromLink(item.link);
+      const workOrderId = item.workOrderId;
       const formattedDate = moment(item.generatedDate)
         .tz("Australia/Sydney")
         .format("DD MMMM YYYY");
+
+      // console.log("workOrderId:", workOrderId);
+      // console.log("formattedDate:", formattedDate);
+      // console.log("searchQuery:", searchQuery);
 
       return (
         item.link &&
@@ -130,7 +134,7 @@ const WorkOrder = () => {
           <p className="text-4xl text-signature font-black mb-5 mt-3">
             Work Order
           </p>
-          <div className="flex">
+          <div className="flex items-center">
             <form className="p-1 flex-grow">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -152,7 +156,7 @@ const WorkOrder = () => {
                 <input
                   type="search"
                   id="default-search"
-                  className="block p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-1/3"
+                  className="block h-12 p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-1/3"
                   placeholder="Search Work Order"
                   required
                   onChange={handleSearchChange}
@@ -160,12 +164,12 @@ const WorkOrder = () => {
                 />
               </div>
             </form>
-            <form class="max-w-sm mx-auto">
+            <form className="max-w-sm mx-auto">
               <select
                 id="countries"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 h-12 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
-                <option value="10" selected>
+                <option value="10" defaultValue>
                   {" "}
                   10
                 </option>
@@ -233,9 +237,7 @@ const WorkOrder = () => {
                       className="border-blue-400 border-1 hover:bg-gray-100"
                     >
                       {/* <TableCell align="center">{row.link}</TableCell> */}
-                      <TableCell align="center">
-                        {row.link && extractIdFromLink(row.link)}
-                      </TableCell>
+                      <TableCell align="center">{row.workOrderId}</TableCell>
                       <TableCell align="center">
                         {moment(row.generatedDate)
                           .tz("Australia/Sydney")
@@ -312,8 +314,7 @@ const WorkOrder = () => {
                         marginTop: "5px",
                       }}
                     >
-                      Work Order ID:{" "}
-                      {qrCodeData && extractIdFromLink(qrCodeData)}
+                      Work Order ID: {modalWorkOrderId}
                     </p>
                   </div>
                 </DialogContent>
@@ -321,7 +322,7 @@ const WorkOrder = () => {
                 <DialogActions>
                   <button
                     className="bg-signature hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded "
-                    onClick={() => handleDownload(modalPdcID)}
+                    onClick={() => handleDownload(modalWorkOrderId)}
                   >
                     Download
                   </button>

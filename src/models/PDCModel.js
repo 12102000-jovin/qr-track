@@ -38,6 +38,12 @@ const PDCSchema = new mongoose.Schema(
     },
     generatedDate: {
       type: String,
+      required: true,
+    },
+    pdcId: {
+      type: String,
+      required: true,
+      unique: true,
     },
     upstairs: [
       {

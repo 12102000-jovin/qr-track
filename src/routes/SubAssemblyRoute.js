@@ -6,7 +6,7 @@ const { UpstairsModel, PDCModel } = require("../models/PDCModel");
 const applicationPortNumber = process.env.REACT_APP_APPLICATION_PORT;
 
 router.post(
-  "/upstair/:WorkOrderId/:PDCId/generateSubAssembly",
+  "/Upstairs/:WorkOrderId/:PDCId/generateSubAssembly",
   async (req, res) => {
     try {
       const { WorkOrderId, PDCId } = req.params;

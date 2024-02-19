@@ -20,6 +20,7 @@ router.post("/generateWorkOrder", async (req, res) => {
   const linksToInsert = req.body.links.map((link) => ({
     link: link.link,
     generatedDate: new Date(),
+    workOrderId: link.workOrderId,
   }));
 
   try {
@@ -53,4 +54,5 @@ router.get("/getAllWorkOrder", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 module.exports = router;
